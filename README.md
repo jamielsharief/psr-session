@@ -108,7 +108,7 @@ interface HttpSessionInterface
 }
 ```
 
-With regards to standardizing the setting and getting the session object on `ServerRequestInterface` object, not sure about the naming thought. Hopefully this allows to extend and not break anything.
+With regards to standardizing the setting and getting the session object on `ServerRequestInterface` object, not sure about the naming though. Hopefully this allows to extend and not break anything.
 
 ```php
 interface ServerRequestSessionInterface 
