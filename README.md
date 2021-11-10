@@ -92,7 +92,7 @@ interface HttpSessionInterface
     public function close(): bool;
 
     /**
-     * Get the session Id
+     * Get the session Id, null means session was destroyed (or not started).
      *
      * @param string|null $sessionId
      * @return string|null
