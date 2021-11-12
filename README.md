@@ -156,7 +156,7 @@ class SessionMiddleware implements MiddlewareInterface
             );
         }
 
-        // create or cunningly  update cookie which also acts as timeout
+        // create or cunningly update cookie which also acts as timeout
         return $response->withAddedHeader(
             'Set-Cookie', $this->createCookieString($this->session->getId(), time() + $this->timeout, $request)
         );
