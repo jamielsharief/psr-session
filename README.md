@@ -111,7 +111,7 @@ interface HttpSessionInterface
 }
 ```
 
-With regards to standardizing the setting and getting the session object on `ServerRequestInterface` object, not sure about the naming though. Hopefully this allows to extend and not break anything.
+With regards to standardizing the setting and getting the session object on `ServerRequestInterface` object
 
 ```php
 interface ServerRequestSessionInterface 
@@ -120,6 +120,10 @@ interface ServerRequestSessionInterface
     public function getSession(): HttpSessionInterface;
 }
 ```
+
+- not sure about the naming though if this interface is used
+- hopefully this allows to extend and not break anything
+- A potential issue here is if the session was not added, do you throw an exception, return `null` etc?
 
 ## Example Middleware
 
