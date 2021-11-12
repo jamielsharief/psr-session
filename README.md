@@ -145,9 +145,7 @@ class SessionMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request->withAttribute('session', $this->session));
 
-        if (! $this->session->close()) {
-            throw new RuntimeException('Error saving session');
-        }
+        $this->session->close(); // Close session if it was not closed or destroyed by user
 
         // was session was destroyed, if so delete delete delete
         if (is_null($this->session->getId())) {
@@ -204,9 +202,7 @@ class PhpSession implements HttpSessionInterface
 
         session_id($this->id);
 
-        /**
-         * Disable the PHP cookie features, credit to @pmjones for this
-         */
+        // Disable the PHP cookie features, credit to @pmjones for this
         $this->isStarted = session_start([
             'use_cookies' => false,
             'use_only_cookies' => false,
@@ -246,8 +242,8 @@ class PhpSession implements HttpSessionInterface
     public function destroy(): void
     {
         $this->session = [];
+        $this->close();
         $this->id = null;
-        $this->isStarted = false;
     }
 
     public function getId(): ?string
@@ -274,7 +270,7 @@ class PhpSession implements HttpSessionInterface
             return false;
         }
 
-        //  I remember there were issues with just overwriting the $_SESSION variable
+        //  I remember there were issues with overwriting the $_SESSION variable
         $removed = array_diff(array_keys($_SESSION), array_keys($this->session));
 
         foreach ($this->session as $key => $value) {
