@@ -247,6 +247,7 @@ class PhpSession implements HttpSessionInterface
     {
         $this->session = [];
         $this->id = null;
+        $this->isStarted = false;
     }
 
     public function getId(): ?string
