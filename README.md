@@ -149,14 +149,16 @@ class SessionMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request->withAttribute('session', $this->session));
 
-        $this->session->close(); // close session if still open, user may have destroyed or closed manualy
+        // close session if still open, user may have destroyed or closed manualy
+        $this->session->close(); 
 
         return $this->addCookieToResponse($request, $response);
     }
 
     /**
      * If the session was destroyed, there will be no id, so delete delete delete. If the 
-     * session ID was regenerated, then the cookie needs to be updated and added a quick timeout feature.
+     * session ID was regenerated, then the cookie needs to be updated and added a quick 
+     * timeout feature.
      */
     private function addCookieToResponse(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
