@@ -12,18 +12,21 @@
 
 ## Security
 
-Security is an issue and is probably why this spec has not be introduced so far, due to the potential complexity. I believe by also standardizing the hooks into the session lifecycle, such as `startup` and `shutdown` this will bring enough flexability into the session spec, so developers are able to deal with security related issues such as validating the session id perhaps or deleting previous data etc.
+- Security is an issue and a potential complexity. I believe by also standardizing the hooks into the session lifecycle, such as `startup` and `shutdown` this will bring enough flexability into the session spec, so developers are able to deal with security related issues such as validating the session id perhaps or deleting previous data etc.
+- Take into consideration OWASP recommendations, including:
+    - the default session name to be `id` to prevent `Session ID Name Fingerprinting`
+    - the session id should be at least 128 bits (16 bytes)
+    - and other recommendations such as cookie settings etc.
 
-## Things to take into consideration
+## Objectives
 
-- User can set, get,check, clear or destroy sessions completley
-- Middleware needs to start, close sessions, set the id, and get the id once the storage creates the ID or regenerates the ID so that it can manage cookies
-- Middleware needs to know if the session was destroyed so it can delete the cookie
-- Hooks into the session lifecycle for security purposes, needs to be handled, validating ID deleting data etc.
-- It needs to work with various types of storage, e.g PHP Sessions, Redis, JWT tokens and single long running processes e.g. Swoole.
+- User can set, get, check, clear or destroy sessions completely
+- Middleware needs to start, close sessions, set the id, and get the id once the storage creates the ID or regenerates the ID so that it can write to the cookie
+- Middleware also needs to know if the session was destroyed so it can delete the cookie
+- Hooks into the session lifecycle for security purposes, needs to be handled
+- It needs to work with various types of storage, e.g PHP Sessions, Redis, JWT tokens and single long-running processes e.g. Swoole.
 
 ## Inital Concept
-
 
 ```php
 interface HttpSessionInterface
@@ -125,7 +128,7 @@ class SessionMiddleware implements MiddlewareInterface
 {
     protected HttpSessionInterface $session;
 
-    protected string $cookieName = 'id';
+    protected string $cookieName = 'id'; // OWASP recommendation
     protected int $timeout = 900; // 15 minutes
     protected string $sameSite = 'lax';
 
@@ -153,7 +156,7 @@ class SessionMiddleware implements MiddlewareInterface
             );
         }
 
-        // cunningly create or update cookie which acts as timeout
+        // create or cunningly  update cookie which also acts as timeout
         return $response->withAddedHeader(
             'Set-Cookie', $this->createCookieString($this->session->getId(), time() + $this->timeout, $request)
         );
@@ -181,21 +184,23 @@ class SessionMiddleware implements MiddlewareInterface
 }
 ```
 
+Here is simple example to demonstrate the concept
+
 ```php
 class PhpSession implements HttpSessionInterface
 {
     private ?string $id = null;
-
     private array $session = [];
     private bool $isRegenerated = false;
+    private bool $isStarted = false;
 
     public function start(?string $id = null): bool
     {
-        if (is_null($id)) {
-            $id = $this->createId();
+        if ($this->isStarted) {
+            return false;
         }
 
-        $this->id = $id;
+        $this->id = $id ?: $this->createId();
 
         session_id($this->id);
 
@@ -274,7 +279,7 @@ class PhpSession implements HttpSessionInterface
      */
     public function createId(): string
     {
-        return bin2hex(random_bytes(16));
+        return bin2hex(random_bytes(16)); // OWASP recommendation
     }
 
     /**
@@ -285,6 +290,10 @@ class PhpSession implements HttpSessionInterface
      */
     public function close(): bool
     {
+        if($this->isStarted === false){
+            return false;
+        }
+
         $removed = array_diff(array_keys($_SESSION), array_keys($this->session));
 
         foreach ($this->session as $key => $value) {
@@ -296,6 +305,7 @@ class PhpSession implements HttpSessionInterface
         }
         $closed = session_write_close();
 
+        $this->isStarted = false;
 
         return $this->isRegenerated ? $this->regenerateSessionData() : $closed;
     }
@@ -309,16 +319,17 @@ class PhpSession implements HttpSessionInterface
     {
         $this->isRegenerated = false;
         $session = $_SESSION; // data still seems to be here
-        $this->start($this->id); // start session with new id
-        $this->session = $session;
+        $this->start($this->id); // start session with new session id
+        $this->session = $session; // kansas city shuffle
 
-        return $this->close();
+        return $this->close(); // save
     }
 }
 ```
 
-
 ## Resources
 
 - https://paul-m-jones.com/post/2016/04/12/psr-7-and-session-cookies/
+- https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
 - https://github.com/mezzio/mezzio-session
+- https://github.com/yiisoft/session
