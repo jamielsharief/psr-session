@@ -151,8 +151,8 @@ class SessionMiddleware implements MiddlewareInterface
     }
 
     /**
-     * If the session was destroyed, there will be no id, so delete delete delete. If the session ID was regenerated, then
-     * the cookie needs to be updated.
+     * If the session was destroyed, there will be no id, so delete delete delete. If the 
+     * session ID was regenerated, then the cookie needs to be updated and added a quick timeout feature.
      */
     private function addCookieToResponse(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
