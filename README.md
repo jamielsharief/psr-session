@@ -285,7 +285,7 @@ class PhpSession implements HttpSessionInterface
         }
         $closed = session_write_close();
 
-        $this->isStarted = false;
+        $this->isStarted = $closed === false;
 
         return $this->isRegenerated ? $this->regenerateSessionData() : $closed;
     }
