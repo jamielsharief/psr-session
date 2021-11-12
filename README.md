@@ -171,7 +171,6 @@ class SessionMiddleware implements MiddlewareInterface
          );
     }
 
-
     private function getSessionId(ServerRequestInterface $request): ?string
     {
         $cookies = $request->getCookieParams();
