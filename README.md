@@ -12,10 +12,10 @@
 
 ## Security
 
-- Security is an issue and a potential complexity. I believe by also standardizing the hooks into the session lifecycle, such as `startup` and `shutdown` this will bring enough flexability into the session spec, so developers are able to deal with security related issues such as validating the session id perhaps or deleting previous data etc.
+- Security is an issue and a potential complexity. I believe by also standardizing the hooks into the session lifecycle, such as `startup` and `shutdown` this will bring enough flexability into the session spec, so developers are able to deal with security related issues such as validating the session ID perhaps or deleting previous data etc.
 - Take into consideration OWASP recommendations, including:
-    - the default session name to be `id` to prevent `Session ID Name Fingerprinting`
-    - the session id should be at least 128 bits (16 bytes)
+    - the default session ID name to be `id` to prevent `Session ID Name Fingerprinting`
+    - the session ID should be at least 128 bits (16 bytes)
     - and other recommendations such as cookie settings etc.
 
 ## Objectives
@@ -103,7 +103,7 @@ interface HttpSessionInterface
     public function getId(): ?string;
 
     /**
-     * Informs the session object to regenerate the session id for the existing session data
+     * Informs the session object to regenerate the session ID for the existing session data
      *
      * @return boolean
      */
@@ -139,7 +139,7 @@ class SessionMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $sessionId = $this->getSessionId($request); // Get value from cookie, session id or perhaps JWT token?
+        $sessionId = $this->getSessionId($request); // Get value from cookie, session ID or perhaps JWT token?
 
         $this->session->start($sessionId);
 
@@ -165,7 +165,7 @@ class SessionMiddleware implements MiddlewareInterface
          );
     }
 
-    
+
     private function getSessionId(ServerRequestInterface $request): ?string
     {
         $cookies = $request->getCookieParams();
@@ -302,7 +302,7 @@ class PhpSession implements HttpSessionInterface
     {
         $this->isRegenerated = false;
         $session = $_SESSION; // data still seems to be here
-        $this->start($this->id); // start session with new session id
+        $this->start($this->id); // start session with new session ID
         $this->session = $session; // kansas city shuffle
 
         return $this->close(); // save
