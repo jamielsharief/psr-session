@@ -207,7 +207,7 @@ class PhpSession implements HttpSessionInterface
         /**
          * Disable the PHP cookie features, credit to @pmjones for this
          */
-        $result = session_start([
+        $this->isStarted = session_start([
             'use_cookies' => false,
             'use_only_cookies' => false,
             'use_trans_sid' => false
@@ -215,10 +215,10 @@ class PhpSession implements HttpSessionInterface
 
         $this->session = $_SESSION ?? [];
 
-        return $result;
+        return $this->isStarted;
     }
 
-    public function set(string $key, $value) : void
+    public function set(string $key, $value): void
     {
         $this->session[$key] = $value;
     }
@@ -249,21 +249,11 @@ class PhpSession implements HttpSessionInterface
         $this->id = null;
     }
 
-    /**
-     * Get the id
-     *
-     * @return string|null
-     */
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * Regenerates an ID
-     *
-     * @return boolean
-     */
     public function regenerateId(): bool
     {
         $this->id = $this->createId();
@@ -272,28 +262,18 @@ class PhpSession implements HttpSessionInterface
         return true;
     }
 
-    /**
-     * Generates a session ID compatible for this storage
-     *
-     * @return string
-     */
     public function createId(): string
     {
         return bin2hex(random_bytes(16)); // OWASP recommendation
     }
 
-    /**
-     *
-     * @internal I remember there were issues with just overwriting the array
-     *
-     * @return boolean
-     */
     public function close(): bool
     {
-        if($this->isStarted === false){
+        if ($this->isStarted === false) {
             return false;
         }
 
+        //  I remember there were issues with just overwriting the $_SESSION variable
         $removed = array_diff(array_keys($_SESSION), array_keys($this->session));
 
         foreach ($this->session as $key => $value) {
