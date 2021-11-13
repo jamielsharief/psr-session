@@ -130,35 +130,33 @@ interface ServerRequestSessionInterface
 ```php
 class SessionMiddleware implements MiddlewareInterface
 {
-    protected HttpSessionInterface $session;
+    private HttpSessionInterface $session;
+    private string $cookieName = 'id';
+    private int $timeout = 900; // 15 minutes
+    private string $sameSite = 'lax';
+    private string $cookiePath = '/';
 
-    protected string $cookieName = 'id'; // OWASP recommendation
-    protected int $timeout = 900; // 15 minutes
-    protected string $sameSite = 'lax';
-
-    public function __construct(HttpSessionInterface $session)
+    public function __construct(SessionInterface $session)
     {
         $this->session = $session;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $sessionId = $this->getSessionId($request); // Get value from cookie, session ID or perhaps JWT token?
+        $sessionId = $this->getSessionId($request); // Get value from cookie, session id or perhaps JWT token?
 
         $this->session->start($sessionId);
 
         $response = $handler->handle($request->withAttribute('session', $this->session));
 
-        // close session if still open, user may have destroyed or closed manualy
-        $this->session->close(); 
+        $this->session->close(); // close session if still open, user may have destroyed or closed manually
 
         return $this->addCookieToResponse($request, $response);
     }
 
     /**
-     * If the session was destroyed, there will be no id, so delete delete delete. If the 
-     * session ID was regenerated, then the cookie needs to be updated and added a quick 
-     * timeout feature.
+     * If the session was destroyed, there will be no id, so delete delete delete. If the session ID was regenerated, then
+     * the cookie needs to be updated.
      */
     private function addCookieToResponse(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -185,7 +183,7 @@ class SessionMiddleware implements MiddlewareInterface
             $this->cookieName,
             $sessionId,
             gmdate('D, d M Y H:i:s T', $expires),
-            ini_get('session.cookie_path'),  // Important!
+            $this->cookiePath,
             $this->sameSite,
             $request->getUri()->getScheme() === 'https' ? ' secure;' : null
         ) ;
