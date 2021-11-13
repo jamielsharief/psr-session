@@ -5,14 +5,14 @@
 1. Currently PHP sessions are not compatible with `PSR-7`
 2. The session object is widely used but there is no standard. A session spec would actually help solve a number of problems, including:
     - standardizing between frameworks
-    - using other peoples implemenations easily
-    - swapping out types of implemenations so if you want to use Swoole, you can move away from the PHP sessions and switch to a Redis handler
-    - Lots of companies like to move their controller logic into reusuable services which would be much easier with a session spec.
+    - using other peoples implementations easily
+    - swapping out types of implementations so if you want to use Swoole, you can move away from the PHP sessions and switch to a Redis handler
+    - Lots of companies like to move their controller logic into reusable services which would be much easier with a session spec.
 3. Another important part of this PSR, I believe, is for a standard way to set and get the Session object on the `ServerRequestInterface` object, without this feature, I think it would be incomplete.
 
 ## Security
 
-- Security is an issue and a potential complexity. I believe by also standardizing the hooks into the session lifecycle, such as `startup` and `shutdown` this will bring enough flexability into the session spec, so developers are able to deal with security related issues such as validating the session ID perhaps or deleting previous data etc.
+- Security is an issue and a potential complexity. I believe by also standardizing the hooks into the session lifecycle, such as `startup` and `shutdown` this will bring enough flexibility into the session spec, so developers are able to deal with security related issues such as validating the session ID perhaps or deleting previous data etc.
 - Take into consideration OWASP recommendations, including:
     - the default session ID name to be `id` to prevent `Session ID Name Fingerprinting`
     - the session ID should be at least 128 bits (16 bytes)
@@ -26,7 +26,7 @@
 - Hooks into the session lifecycle for security purposes, needs to be handled
 - It needs to work with various types of storage, e.g PHP Sessions, Redis, JWT tokens and single long-running processes e.g. Swoole.
 
-## Inital Concept
+## Initial Concept
 
 ```php
 interface HttpSessionInterface
@@ -191,7 +191,7 @@ class SessionMiddleware implements MiddlewareInterface
 }
 ```
 
-Here is simple example to demonstrate the concept
+Here is a simple example to demonstrate the concept
 
 ```php
 class PhpSession implements HttpSessionInterface
