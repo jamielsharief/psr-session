@@ -85,7 +85,7 @@ interface HttpSessionInterface
      * @param string|null $sessionId
      * @return boolean
      */
-    public function start(?string $sessionId = null): bool;
+    public function start(?string $sessionId): bool;
 
     /**
      * Closes a session and writes to storage
@@ -201,7 +201,7 @@ class PhpSession implements HttpSessionInterface
     private bool $isRegenerated = false;
     private bool $isStarted = false;
 
-    public function start(?string $id = null): bool
+    public function start(?string $id): bool
     {
         if ($this->isStarted) {
             return false;
