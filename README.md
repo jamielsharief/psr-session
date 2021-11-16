@@ -279,9 +279,8 @@ class PhpSession implements SessionInterface
             return false;
         }
 
-        //  I remember there were issues with overwriting the $_SESSION variable
+        // I think there were some issues with overwriting the $_SESSION variable directly
         $removed = array_diff(array_keys($_SESSION), array_keys($this->session));
-
         foreach ($this->session as $key => $value) {
             $_SESSION[$key] = $value;
         }
