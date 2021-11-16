@@ -29,7 +29,7 @@
 ## Initial Concept
 
 ```php
-interface HttpSessionInterface
+interface SessionInterface
 {
     /**
      * Sets a value in the session
@@ -116,8 +116,8 @@ With regards to standardizing the setting and getting the session object on `Ser
 ```php
 interface ServerRequestSessionInterface 
 {
-    public function setSession(HttpSessionInterface $session): void;
-    public function getSession(): HttpSessionInterface;
+    public function setSession(SessionInterface $session): void;
+    public function getSession(): SessionInterface;
 }
 ```
 
@@ -130,7 +130,7 @@ interface ServerRequestSessionInterface
 ```php
 class SessionMiddleware implements MiddlewareInterface
 {
-    private HttpSessionInterface $session;
+    private SessionInterface $session;
     private string $cookieName = 'id';
     private int $timeout = 900; // 15 minutes
     private string $sameSite = 'lax';
@@ -194,7 +194,7 @@ class SessionMiddleware implements MiddlewareInterface
 Here is a simple example to demonstrate the concept
 
 ```php
-class PhpSession implements HttpSessionInterface
+class PhpSession implements SessionInterface
 {
     private ?string $id = null;
     private array $session = [];
