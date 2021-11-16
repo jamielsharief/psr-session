@@ -207,7 +207,7 @@ class PhpSession implements SessionInterface
             return false;
         }
 
-        $this->id = $id ?: $this->createId();
+        $this->id = $id ?: $this->generateId();
 
         session_id($this->id);
 
@@ -262,13 +262,13 @@ class PhpSession implements SessionInterface
 
     public function regenerateId(): bool
     {
-        $this->id = $this->createId();
+        $this->id = $this->generateId();
         $this->isRegenerated = true;
 
         return true;
     }
 
-    public function createId(): string
+    private function generateId(): string
     {
         return bin2hex(random_bytes(16)); // OWASP recommendation
     }
