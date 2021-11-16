@@ -182,7 +182,7 @@ class SessionMiddleware implements MiddlewareInterface
             '%s=%s; expires=%s; path=%s; samesite=%s;%s httponly',
             $this->cookieName,
             $sessionId,
-            gmdate('D, d M Y H:i:s T', $expires),
+            gmdate(\DateTime::COOKIE, $expires),
             $this->cookiePath,
             $this->sameSite,
             $request->getUri()->getScheme() === 'https' ? ' secure;' : null
